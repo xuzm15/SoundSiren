@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SoundSiren Console</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="grid"></div>
+
+    <header class="hero">
+      <div class="hero-top">
+        <div class="logo">SoundSiren</div>
+        <nav class="nav">
+          <a href="#vision">Vision</a>
+          <a href="#pipeline">Pipeline</a>
+          <a href="#console">Console</a>
+        </nav>
+      </div>
+      <div class="hero-content">
+        <p class="eyebrow">Zero-Shot Neural Vocal Morphing</p>
+        <h1>让日常语音直接变成可发布的歌唱。</h1>
+        <p class="lead">
+          极简输入，端到端渲染。SoundSiren 用 LLM 编排将搜索、分离、校音与合成整合为一条自动化流水线。
+        </p>
+        <div class="hero-actions">
+          <button class="primary">Create Demo</button>
+          <button class="ghost">View API</button>
+        </div>
+        <div class="hero-metrics">
+          <div>
+            <span class="metric">3–30s</span>
+            <span class="label">语音样本</span>
+          </div>
+          <div>
+            <span class="metric">1–3min</span>
+            <span class="label">端到端渲染</span>
+          </div>
+          <div>
+            <span class="metric">Zero-Shot</span>
+            <span class="label">身份提取</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="vision" class="section">
+        <h2>核心愿景</h2>
+        <p>
+          在传统语音合成与歌词合成之间，SoundSiren 用极简接口消除技术参数的干扰，实现“输入即所得”。
+        </p>
+        <div class="cards">
+          <article class="card">
+            <h3>身份解耦</h3>
+            <p>少量语音即可锁定声纹身份，保持个性化演唱。</p>
+          </article>
+          <article class="card">
+            <h3>自动流水线</h3>
+            <p>搜索、伴奏分离、音高修正、合成渲染一体化执行。</p>
+          </article>
+          <article class="card">
+            <h3>LLM 编排</h3>
+            <p>让模型决定流程策略，自动做质量评估与回退。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="pipeline" class="section">
+        <h2>端到端流水线</h2>
+        <div class="pipeline">
+          <div class="step">
+            <span>01</span>
+            <h4>Identity Encoder</h4>
+            <p>提取 Zero-Shot 声纹向量。</p>
+          </div>
+          <div class="step">
+            <span>02</span>
+            <h4>Song Retrieval</h4>
+            <p>从多源检索歌曲素材。</p>
+          </div>
+          <div class="step">
+            <span>03</span>
+            <h4>Source Separation</h4>
+            <p>伴奏与人声分离。</p>
+          </div>
+          <div class="step">
+            <span>04</span>
+            <h4>Pitch Alignment</h4>
+            <p>对齐目标旋律与韵律。</p>
+          </div>
+          <div class="step">
+            <span>05</span>
+            <h4>Singing Synthesizer</h4>
+            <p>生成高保真人声。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="console" class="section console">
+        <h2>控制台雏形</h2>
+        <div class="console-shell">
+          <div class="console-left">
+            <label>Voice Samples</label>
+            <div class="dropzone">
+              <p>Drag & drop or click to upload</p>
+              <small>3–30s spoken audio</small>
+            </div>
+            <label>Song Query</label>
+            <input type="text" placeholder="Song name / link" />
+            <label>Emotion</label>
+            <input type="text" placeholder="Warm, cinematic, intimate" />
+            <label>Style</label>
+            <input type="text" placeholder="Neo-soul, airy, bright" />
+            <button class="primary full">Generate</button>
+          </div>
+          <div class="console-right">
+            <div class="preview">
+              <h3>Preview</h3>
+              <div class="wave">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+              <p class="hint">LLM orchestration running...</p>
+            </div>
+            <div class="log">
+              <p><span>Task</span> search_song → stem_split → pitch_align → synth_render</p>
+              <p><span>Status</span> queued</p>
+              <p><span>ETA</span> 2m 20s</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>SoundSiren Console · Prototype UI</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
