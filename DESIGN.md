@@ -1,98 +1,98 @@
-# SoundSiren 设计草案（Vision Draft）
+# SoundSiren 设计草案（Updated Vision）
 
-目标：将“日常语音 -> 高保真歌唱”的复杂神经渲染流水线抽象为极简接口，做到“输入即所得”。
+目标：将“日常语音 -> 高保真歌唱”的复杂流水线抽象为极简接口，实现“输入即所得”。
+
+> English version: `DESIGN_EN.md`
+
+---
 
 ## 1. 产品定义
-- 一句话：SoundSiren 是一个 Zero-Shot 的语音转歌唱合成系统，只需极短的日常语音样本即可生成带有个人声纹的任意歌曲演唱。
+- 一句话：SoundSiren 是一个 Zero‑Shot 的语音转歌唱系统，用极短语音样本即可生成带有个性声纹的歌唱。
 - 受众：
-  - 创作者：想用自己的声音快速生成歌唱 demo
-  - AIGC 工具链开发者：需要高层接口与可编排的语音合成能力
-  - 研究人员：关注高保真声纹迁移、歌唱韵律与情感建模
+  - 创作者：快速生成个人声线的歌唱 demo
+  - AIGC 工具链开发者：需要高层接口与可编排的声线转换能力
+  - 研究人员：关注高保真声纹迁移、旋律与情感建模
 
 ## 2. 核心承诺（产品级）
-- Zero‑Shot 身份提取：无需微调，少量语音样本即可锁定声纹身份。
-- 端到端自动化：搜索、分离、校音、合成、渲染一体化闭环。
-- LLM 驱动编排：将“找歌 -> 分离 -> 风格/情感 -> 生成”流程抽象成可编排的语言层。
+- Zero‑Shot 身份提取：无需微调，少量语音即可锁定声纹特征。
+- 端到端自动化：搜索、分离、音高控制、合成、渲染一体化。
+- LLM 编排（规划中）：从检索到情感/风格的中间层编排。
 - 极简交互：复杂信号处理隐藏于简单 API/CLI。
 
-## 3. 体验与交互（首版）
-### 3.1 用户流程
-1. 上传 3–30 秒日常语音（或多段短音频）
-2. 输入歌曲名/链接 + 可选情感描述
-3. 系统自动完成：搜索/伴奏分离/音高修正/合成渲染
-4. 输出：完整演唱音频 + 可选多版本（情感/风格）
+## 3. 当前实现（MVP 已落地）
+### 3.1 已实现能力
+- 本地/检索歌曲输入（`song_query` 支持本地路径）
+- 伴奏/人声分离（Demucs）
+- 歌唱变声（Seed‑VC 外部调用）
+- 混音渲染（FFmpeg）
+- Demo 模式：默认 30 秒，加速验证效果
+- 基础降噪：人声/伴奏/转换后人声轻量降噪
 
-### 3.2 交互形态
-- API（优先）：面向开发者与工具链接入
-- Web 控制台（可选）：演示、试听与参数调优
-- CLI（可选）：批处理/内部调试
+### 3.2 已知限制
+- YouTube 下载可能触发验证码，需要 cookies
+- 本机推理速度偏慢，完整歌曲耗时长
+- Seed‑VC 输出仍可能出现“电音/颤音”，需参数调优
 
-## 4. 系统架构（高层）
+## 4. 体验与交互（首版）
+1. 上传 3–30 秒日常语音
+2. 输入歌曲名/链接（或本地文件）+ 可选情感描述
+3. 系统执行：检索/分离/转换/混音
+4. 输出：歌唱音频（demo/整曲）
+
+交互形态：
+- API（优先）
+- CLI（优先）
+- Web 控制台（演示用）
+
+## 5. 系统架构（当前版）
 ```
-Input Audio + Song Query
+Input Speech + Song Query
         |
-   [Identity Encoder] ----> Vocal Identity
+   [Song Retrieval] -> (optional cookies)
         |
-    [LLM Orchestrator] -> tasks: search -> stem -> pitch -> render
+   [Source Separation (Demucs)]
         |
-   [Singing Synthesizer]
+   [Seed-VC Conversion]
         |
-   Rendered Singing
+   [Denoise + Mixdown]
+        |
+   Output Audio
 ```
 
-### 4.1 模块拆解
-- Identity Encoder: 从少量语音抽取声纹向量
-- Song Retrieval: 搜索歌曲及歌词/音频源
-- Source Separation: 人声/伴奏分离
-- Pitch Alignment: 将人声音高与目标旋律对齐
-- Singing Synthesizer: 生成歌唱人声
-- Mixing/Rendering: 与伴奏混合，输出可发布音频
-
-## 5. LLM 编排层（中枢逻辑）
-LLM 负责：多源查询、意图解析、风格/情感建模、异常兜底与多版本策略。
-- 输入：用户 query、可用资源、目标风格
-- 输出：可执行任务图 + 质量评估建议
-
-## 6. API 设计（初稿）
-### 6.1 核心接口
+## 6. API 设计（当前）
 `POST /v1/sing`
 - input:
   - `voice_samples[]` (audio)
-  - `song_query` (string)
-  - `emotion` (optional, string)
-  - `style` (optional, string)
+  - `song_query` (string 或本地路径)
+  - `demo_seconds` (optional, default=30)
   - `output_format` (optional)
 - output:
   - `job_id`
   - `preview_url`
+  - `output_path`
 
 `GET /v1/jobs/{id}`
 - output:
   - `status`
   - `result_urls[]`
-  - `metadata` (pitch, alignment, style tags)
-
-### 6.2 设计原则
-- 默认合理：用户不填参数也能得到可用结果
-- 失败可解释：返回清晰的错误与修复建议
-- 低学习成本：仅暴露必要选项
+  - `metadata`
 
 ## 7. 质量目标（MVP）
-- 音色一致性：与样本声纹高度一致（主观评分优先）
-- 旋律准确性：音高偏差低于指定阈值
-- 合成自然度：无明显电子噪声、气声衰减可控
-- 端到端延迟：单曲 1–3 分钟内完成
+- 音色一致性：主观相似度可接受
+- 旋律准确性：保留原唱旋律
+- 合成自然度：减少电音/颤音
+- Demo 时延：2–8 分钟（本机推理）
 
 ## 8. 风险与对策
-- 版权来源：提供可替换的检索/上传入口
-- 语音样本质量：通过质量评估提示用户补录
-- 歌曲难度差异：提供多版本 fallback（简化旋律）
+- 版权来源：优先支持本地文件，下载时提示 cookies
+- 样本质量：建议干净/近讲录音
+- 推理时长：默认 demo 模式，整曲需更高算力
 
-## 9. 后续里程碑（建议）
-- M0：API 原型 + 基础流水线
-- M1：Zero‑Shot 身份提取增强 + 歌唱自然度提升
-- M2：LLM 编排优化 + 多版本质量评估
-- M3：Web 控制台 + 多语言支持
+## 9. 后续里程碑
+- M0：当前 MVP 已完成（demo pipeline）
+- M1：音色相似度优化（F0 平滑 / 模型调参 / 去噪）
+- M2：LLM 编排与多版本生成
+- M3：Web 控制台与多语言支持
 
 ---
-下一步：确认该设计方向与术语边界（产品/系统/模型），再进入代码与仓库初始化。
+下一步：明确产品路线（Zero‑Shot 真实 SVS vs. SVC），再决定训练/推理体系升级。
