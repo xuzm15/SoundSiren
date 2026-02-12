@@ -51,6 +51,6 @@ cat <<'EOM'
 Next:
 1) export SOUNDSIREN_SEED_VC_DIR=<path to seed-vc>
 2) export SOUNDSIREN_VC_BACKEND=external
-3) export SOUNDSIREN_VC_COMMAND="bash scripts/seed_vc_convert.sh --input {input} --output {output} --reference {reference}"
+3) export SOUNDSIREN_VC_COMMAND="bash scripts/seed_vc_convert.sh --input $input --output $output --reference $reference"
 4) uvicorn soundsiren.api.app:app --reload
 EOM
