@@ -76,4 +76,4 @@ export SOUNDSIREN_YTDLP_COOKIES_FROM_BROWSER=edge
 见 `ROADMAP.md`。
 
 ## 文档
-- 设计草案：`DESIGN.md`
+- 设计草案：`DESIGN_CN.md`
