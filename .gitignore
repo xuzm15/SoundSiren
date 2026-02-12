@@ -10,3 +10,4 @@ __pycache__/
 runs/
 third_party/
 .seed_vc_requirements.filtered.txt
+*.egg-info/
